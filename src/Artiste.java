@@ -5,12 +5,13 @@ public class Artiste {
 
     int id;
     String nom;
-    Set categorie = new HashSet<>();
+    Set<String> categories;
 
-    public Artiste(int id, String nom, Set categorie){
+    public Artiste(int id, String nom, Set<String> categories){
+        categories = new HashSet<>();
         this.id = id;
         this.nom = nom;
-        this.categorie = categorie;
+        this.categories = categories;
     }
 
     public String getNom() {
@@ -21,7 +22,7 @@ public class Artiste {
         return id;
     }
 
-    public Set getCategorie() {
-        return categorie;
+    public Set<String> getCategories() {
+        return categories;
     }
 }
