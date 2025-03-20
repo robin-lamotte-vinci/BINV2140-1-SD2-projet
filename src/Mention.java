@@ -1,10 +1,10 @@
-public class Arc {
+public class Mention {
     private final Artiste artiste1;
     private final Artiste artiste2;
 
     private final int nbMentions;
 
-    public Arc(Artiste artiste1, Artiste artiste2, int nbMentions) {
+    public Mention(Artiste artiste1, Artiste artiste2, int nbMentions) {
         this.artiste1 = artiste1;
         this.artiste2 = artiste2;
         this.nbMentions = nbMentions;
@@ -24,11 +24,11 @@ public class Arc {
 
     @Override
     public String toString() {
-        return "Arc{" +
-                "artiste1=" + artiste1 +
-                ", artiste2=" + artiste2 +
-                ", nbMentions=" + nbMentions +
-                '}';
+        return "Mention{" +
+            "artiste1=" + artiste1 +
+            ", artiste2=" + artiste2 +
+            ", nbMentions=" + nbMentions +
+            '}';
     }
 }
 
