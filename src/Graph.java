@@ -23,6 +23,10 @@ public class Graph {
     completerMentions(pathMentionsTxt);
   }
 
+  /**
+   * Lis le fichier référencé par pathArtistesTxt et pour chaque ligne, ajoute un artiste au graph
+   * @param pathArtistesTxt
+   */
   private void completerArtistes(String pathArtistesTxt) {
     try (BufferedReader lecteur = new BufferedReader(new FileReader(pathArtistesTxt))) {
       String artisteString;
@@ -40,6 +44,10 @@ public class Graph {
     }
   }
 
+  /**
+   * Lis le fichier référencé par pathMentionsTxt et pour chaque ligne, ajoute une mention au graph
+   * @param pathMentionsTxt
+   */
   private void completerMentions(String pathMentionsTxt) {
     try (BufferedReader lecteur = new BufferedReader(new FileReader(pathMentionsTxt))) {
       String mentionString;
@@ -68,6 +76,11 @@ public class Graph {
   private void ajouterArtiste(Artiste artiste){
     // faut-il checker si l'artiste est deja present ??
     // il faudra peut etre l'ajouter la gestion de ce cas...
+
+    // il n'y a pas 2 fois le meme noms d'artiste, mais si c'etait le cas ca poserait probleme
+    if (correspondanceStringArtiste.containsKey(artiste.getNom())){
+      System.out.println("DOUBLONS");
+    }
 
     String nom = artiste.getNom();
     correspondanceStringArtiste.put(nom, artiste);
@@ -113,7 +126,6 @@ public class Graph {
     }
     return false;
   }
-
 
   public void trouverCheminLePlusCourt(String nomArtiste1, String nomArtiste2) {
     Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
