@@ -8,6 +8,7 @@ public class Graph {
   private Map<String, Artiste> correspondanceStringArtiste;
   private Map<Integer, Artiste> correspondanceIdArtiste;
   private Map<Artiste, Set<Mention>> mentionsSortantes;
+  private LinkedList<Map<Artiste,Artiste>> listeAdjacence;
 
   public Graph(String pathArtistesTxt, String pathMentionsTxt) {
 
@@ -18,6 +19,13 @@ public class Graph {
     completerArtistes(pathArtistesTxt);
 
     completerMentions(pathMentionsTxt);
+  }
+  public Graph(int nbArtistes) {
+    listeAdjacence = new LinkedList<>();
+    for(int i=0; i<nbArtistes; i++) {
+      Map<Artiste,Artiste> lienArtistes = new HashMap<Artiste,Artiste>();
+      listeAdjacence.add(lienArtistes);
+    }
   }
 
   /**
@@ -133,6 +141,13 @@ public class Graph {
   public void trouverCheminLePlusCourt(String nomArtiste1, String nomArtiste2) {
     Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
     Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
+    Map<Artiste,Artiste> map = new HashMap<>();
+    map.put(artiste1, artiste2);
+
+
+
+
+
 
     // TODO trouver le chemin le plus court
   }
