@@ -25,6 +25,7 @@ public class Graph {
 
   /**
    * Lis le fichier référencé par pathArtistesTxt et pour chaque ligne, ajoute un artiste au graph
+   *
    * @param pathArtistesTxt
    */
   private void completerArtistes(String pathArtistesTxt) {
@@ -73,12 +74,12 @@ public class Graph {
    * Ajoute l'artiste au graph
    * @param artiste
    */
-  private void ajouterArtiste(Artiste artiste){
+  private void ajouterArtiste(Artiste artiste) {
     // faut-il checker si l'artiste est deja present ??
     // il faudra peut etre l'ajouter la gestion de ce cas...
 
     // il n'y a pas 2 fois le meme noms d'artiste, mais si c'etait le cas ca poserait probleme
-    if (correspondanceStringArtiste.containsKey(artiste.getNom())){
+    if (correspondanceStringArtiste.containsKey(artiste.getNom())) {
       System.out.println("DOUBLONS");
     }
 
@@ -95,7 +96,7 @@ public class Graph {
    * Ajoute la mention au graph
    * @param mention
    */
-  private void ajouterMention(Mention mention){
+  private void ajouterMention(Mention mention) {
     // pareil, j'ai pas mis de gestion des exceptions
     Artiste artiste = mention.getArtiste1();
     mentionsArtiste(artiste).add(mention);
@@ -106,7 +107,7 @@ public class Graph {
    * @param artiste
    * @return ensemble des mentions sortantes d'artiste
    */
-  private Set<Mention> mentionsArtiste(Artiste artiste){
+  private Set<Mention> mentionsArtiste(Artiste artiste) {
     return mentionsSortantes.get(artiste);
   }
 
@@ -116,11 +117,11 @@ public class Graph {
    * @param artiste2
    * @return true si artiste1 contient une mention vers artiste2
    */
-  public boolean estMentionne(Artiste artiste1, Artiste artiste2){
+  public boolean estMentionne(Artiste artiste1, Artiste artiste2) {
     // TODO rendre la methode privee;
     // elle reste publique pour l'instant pour mes tests
-    for (Mention mention : mentionsArtiste(artiste1)){
-      if (mention.getArtiste2().equals(artiste2)){
+    for (Mention mention : mentionsArtiste(artiste1)) {
+      if (mention.getArtiste2().equals(artiste2)) {
         return true;
       }
     }
