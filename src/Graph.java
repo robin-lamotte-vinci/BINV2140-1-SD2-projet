@@ -146,7 +146,16 @@ public class Graph {
     Map<Artiste, Integer> maxMentions = new HashMap<>();
     maxMentions.put(artiste1, 0);
 
-    PriorityQueue<Artiste> queue = new PriorityQueue<>(Comparator.comparingInt(maxMentions::get).reversed());
+    //PriorityQueue<Artiste> queue = new PriorityQueue<>(Comparator.comparingInt(maxMentions::get).reversed());
+
+    PriorityQueue<Artiste> queue = new PriorityQueue<>((a1, a2) -> {
+      int compareMentions = Integer.compare(maxMentions.get(a2), maxMentions.get(a1));
+      if (compareMentions == 0) {
+        return a1.getNom().compareTo(a2.getNom());
+      }
+      return compareMentions;
+    });
+
     Set<Artiste> dejaVisite = new HashSet<>();
     Map<Artiste, Artiste> predecesseur = new HashMap<>();
 
@@ -155,6 +164,7 @@ public class Graph {
     while (!queue.isEmpty()) {
       Artiste currentArtiste = queue.poll();
       if(!dejaVisite.add(currentArtiste)) continue;
+      dejaVisite.add(currentArtiste);
 
       int currentMentions = maxMentions.get(currentArtiste);
 
