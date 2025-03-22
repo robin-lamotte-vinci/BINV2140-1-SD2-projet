@@ -191,6 +191,6 @@ public class Graph {
     }
     Collections.reverse(chemin);
 
-    System.out.println("Longueur du chemin : "+longueur + " \nCoût total du chemin : " + totalMentions + " Chemin : " + String.join("\n", chemin));
+    System.out.println("Longueur du chemin : "+longueur + " \nCoût total du chemin : " + totalMentions + " Chemin : \n" + String.join("\n", chemin));
   }
 }
