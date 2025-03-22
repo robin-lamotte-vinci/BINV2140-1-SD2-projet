@@ -1,10 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Graph {
 
@@ -47,6 +44,7 @@ public class Graph {
 
   /**
    * Lis le fichier référencé par pathMentionsTxt et pour chaque ligne, ajoute une mention au graph
+   *
    * @param pathMentionsTxt
    */
   private void completerMentions(String pathMentionsTxt) {
@@ -72,6 +70,7 @@ public class Graph {
 
   /**
    * Ajoute l'artiste au graph
+   *
    * @param artiste
    */
   private void ajouterArtiste(Artiste artiste) {
@@ -94,6 +93,7 @@ public class Graph {
 
   /**
    * Ajoute la mention au graph
+   *
    * @param mention
    */
   private void ajouterMention(Mention mention) {
@@ -104,6 +104,7 @@ public class Graph {
 
   /**
    * Renvoie l'ensemble des mentions sortantes de l'artiste
+   *
    * @param artiste
    * @return ensemble des mentions sortantes d'artiste
    */
@@ -113,6 +114,7 @@ public class Graph {
 
   /**
    * Verifie si l'artiste1 contient une mention vers l'artiste2
+   *
    * @param artiste1
    * @param artiste2
    * @return true si artiste1 contient une mention vers artiste2
@@ -140,5 +142,55 @@ public class Graph {
     Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
 
     // TODO trouver le chemin le plus fortement connecté
+
+    Map<Artiste, Integer> maxMentions = new HashMap<>();
+    maxMentions.put(artiste1, 0);
+
+    PriorityQueue<Artiste> queue = new PriorityQueue<>(Comparator.comparingInt(maxMentions::get).reversed());
+    Set<Artiste> dejaVisite = new HashSet<>();
+    Map<Artiste, Artiste> predecesseur = new HashMap<>();
+
+    queue.add(artiste1);
+
+    while (!queue.isEmpty()) {
+      Artiste currentArtiste = queue.poll();
+      if(!dejaVisite.add(currentArtiste)) continue;
+
+      int currentMentions = maxMentions.get(currentArtiste);
+
+      if (currentArtiste.equals(artiste2)) {
+        afficherChemin(predecesseur, artiste1, artiste2, currentMentions);
+        return;
+      }
+
+      for (Mention mention : mentionsArtiste(currentArtiste)) {
+        Artiste voisin = mention.getArtiste2();
+        if(dejaVisite.contains(voisin)) continue;
+
+        int newMentions = currentMentions + mention.getNbMentions();
+
+        if (!maxMentions.containsKey(voisin) || newMentions > maxMentions.get(voisin)) {
+          maxMentions.put(voisin, newMentions);
+          predecesseur.put(voisin, currentArtiste);
+          queue.add(voisin);
+        }
+      }
+    }
+    throw new RuntimeException("Aucun chemin trouvé entre " + nomArtiste1 + " et " + nomArtiste2);
+  }
+
+  private void afficherChemin(Map<Artiste, Artiste> predecesseur, Artiste debut, Artiste fin, int totalMentions) {
+    List<String> chemin = new ArrayList<>();
+    Artiste courant = fin;
+    int longueur = 0;
+
+    while (courant != null) {
+      chemin.add(courant.getNom());
+      courant = predecesseur.get(courant);
+      if (courant != null) longueur++;
+    }
+    Collections.reverse(chemin);
+
+    System.out.println("Longueur du chemin : "+longueur + " \nCoût total du chemin : " + totalMentions + " Chemin : " + String.join("\n", chemin));
   }
 }

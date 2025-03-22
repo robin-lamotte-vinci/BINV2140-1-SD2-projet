@@ -12,16 +12,18 @@ public class Test {
     Artiste artiste3 = new Artiste(234,"David Guetta");
     Mention mention1 = new Mention(artiste3,artiste1,1);
     Mention mention2 = new Mention(artiste3,artiste2,2);
-    graph.ajouterArtiste(artiste3);
-    graph.ajouterMention(mention1);
-    graph.mentionsArtiste(artiste3).add(mention1);
-    graph.mentionsArtiste(artiste3).add(mention2);
-    System.out.println(graph.mentionsArtiste(artiste3).size());
-
-
-
+    //graph.ajouterArtiste(artiste3);
+    //graph.ajouterMention(mention1);
+    //graph.mentionsArtiste(artiste3).add(mention1);
+    //graph.mentionsArtiste(artiste3).add(mention2);
+    //System.out.println(graph.mentionsArtiste(artiste3).size());
 
     boolean estMentionne = graph.estMentionne(artiste1, artiste2);
     System.out.println("RESULT: " + estMentionne);
+
+    Artiste kendji = new Artiste(19461,"Kendji Girac");
+    Artiste beatles = new Artiste(35204,"The Beatles");
+
+    graph.trouverCheminMaxMentions(beatles.getNom(),  kendji.getNom());
   }
 }
