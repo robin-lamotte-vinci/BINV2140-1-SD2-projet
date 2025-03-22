@@ -4,10 +4,12 @@ public class Artiste {
 
     private int id;
     private String nom;
+    private String categories;
 
-    public Artiste(int id, String nom){
+    public Artiste(int id, String nom, String categories){
         this.id = id;
         this.nom = nom;
+        this.categories = categories;
     }
 
     public String getNom() {
@@ -30,5 +32,10 @@ public class Artiste {
     @Override
     public int hashCode() {
         return Objects.hash(id, nom);
+    }
+
+    @Override
+    public String toString() {
+        return nom + " (" + categories + ")";
     }
 }

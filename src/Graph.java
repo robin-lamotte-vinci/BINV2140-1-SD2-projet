@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class Graph {
 
@@ -41,8 +42,9 @@ public class Graph {
 
         int id = Integer.parseInt(artisteStringTab[0]);
         String nom = artisteStringTab[1];
+        String categories = artisteStringTab[2];
 
-        Artiste artiste = new Artiste(id, nom);
+        Artiste artiste = new Artiste(id, nom, categories);
         ajouterArtiste(artiste);
       }
     } catch (IOException e) {
@@ -217,5 +219,70 @@ public class Graph {
     Collections.reverse(chemin);
 
     System.out.println("Longueur du chemin : "+longueur + " \nCoût total du chemin : " + coutTotal + " Chemin : \n" + String.join("\n", chemin));
+  }
+
+  public void trouverCheminMaxMentionsBis(String nomArtiste1, String nomArtiste2){
+    Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
+    Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
+
+    Map<Artiste, Double> etiquettesProvisoires = new HashMap<>();
+    Map<Artiste, Double> etiquettesDefinitives = new HashMap<>();
+
+    Queue<Artiste> chemin = new ArrayDeque<>();
+
+    for (Mention mention : mentionsSortantes.get(artiste1)){
+      Artiste a = mention.getArtiste2();
+      etiquettesProvisoires.put(a, mention.getPoids());
+    }
+
+    etiquettesDefinitives.put(artiste1, 0.0);
+    chemin.add(artiste1);
+
+    while (!etiquettesProvisoires.isEmpty()) {
+      Entry<Artiste, Double> etiquetteMin = etiquettesProvisoires
+          .entrySet()
+          .stream()
+          .min(Map.Entry.comparingByValue())
+          .orElseThrow(() -> new IllegalStateException("La collection ne devrait jamais être vide à ce stade"));
+
+      Artiste artistePoidsMin = etiquetteMin.getKey();
+      Double poidsMin = etiquetteMin.getValue();
+
+      etiquettesProvisoires.remove(artistePoidsMin);
+      etiquettesDefinitives.put(artistePoidsMin, poidsMin);
+      chemin.add(artistePoidsMin);
+
+      if (artistePoidsMin.equals(artiste2)) {
+        //on a trouvé le chemin definitif
+        System.out.println("Longueur du chemin : " + (chemin.size()-1));
+        System.out.println("Coût total du chemin : " + poidsMin);
+        System.out.println("Chemin :");
+
+        Artiste a;
+        while( ( a = chemin.poll()) != null) {
+          System.out.println(a);
+        }
+        return;
+      }
+
+      for (Mention mention : mentionsSortantes.get(artistePoidsMin)){
+        Artiste aMentionne = mention.getArtiste2();
+
+        // si etiquettesDefinitives contient deja cet artiste, continue
+        if (etiquettesDefinitives.containsKey(aMentionne)) continue;
+
+        double nouveauPoids = poidsMin + mention.getPoids();
+
+        Double poidsActuel = etiquettesProvisoires.get(aMentionne); // null si artiste pas encore présent
+        if (poidsActuel == null ||  poidsActuel > nouveauPoids){
+          etiquettesProvisoires.put(aMentionne, nouveauPoids);
+        }
+      }
+    }
+
+    //si on arrive ici, c'est qu'on a pas trouvé de chemin
+    String message = String.format("Aucun chemin entre %s et %s", nomArtiste1, nomArtiste2);
+    throw new RuntimeException( message );
+
   }
 }

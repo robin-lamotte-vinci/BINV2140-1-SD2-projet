@@ -22,6 +22,10 @@ public class Mention {
         return nbMentions;
     }
 
+    public double getPoids(){
+        return (double) 1 /nbMentions;
+    }
+
     @Override
     public String toString() {
         return "Mention{" +
