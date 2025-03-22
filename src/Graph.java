@@ -143,17 +143,17 @@ public class Graph {
 
     // TODO trouver le chemin le plus fortement connecté
 
-    Map<Artiste, Integer> maxMentions = new HashMap<>();
-    maxMentions.put(artiste1, 0);
+    Map<Artiste, Double> coutChemin = new HashMap<>();
+    coutChemin.put(artiste1, 0.0);
 
     //PriorityQueue<Artiste> queue = new PriorityQueue<>(Comparator.comparingInt(maxMentions::get).reversed());
 
     PriorityQueue<Artiste> queue = new PriorityQueue<>((a1, a2) -> {
-      int compareMentions = Integer.compare(maxMentions.get(a2), maxMentions.get(a1));
-      if (compareMentions == 0) {
+      int compareCout = Double.compare(coutChemin.get(a2), coutChemin.get(a1));
+      if (compareCout == 0) {
         return a1.getNom().compareTo(a2.getNom());
       }
-      return compareMentions;
+      return compareCout;
     });
 
     Set<Artiste> dejaVisite = new HashSet<>();
@@ -164,12 +164,11 @@ public class Graph {
     while (!queue.isEmpty()) {
       Artiste currentArtiste = queue.poll();
       if(!dejaVisite.add(currentArtiste)) continue;
-      dejaVisite.add(currentArtiste);
 
-      int currentMentions = maxMentions.get(currentArtiste);
+      double currentCout = coutChemin.get(currentArtiste);
 
       if (currentArtiste.equals(artiste2)) {
-        afficherChemin(predecesseur, artiste1, artiste2, currentMentions);
+        afficherChemin(predecesseur, artiste1, artiste2, currentCout);
         return;
       }
 
@@ -177,11 +176,12 @@ public class Graph {
         Artiste voisin = mention.getArtiste2();
         if(dejaVisite.contains(voisin)) continue;
 
-        int newMentions = currentMentions + mention.getNbMentions();
+        double newCout = currentCout + (1.0 / mention.getNbMentions());
 
-        if (!maxMentions.containsKey(voisin) || newMentions > maxMentions.get(voisin)) {
-          maxMentions.put(voisin, newMentions);
+        if (!coutChemin.containsKey(voisin) || newCout > coutChemin.get(voisin)) {
+          coutChemin.put(voisin, newCout);
           predecesseur.put(voisin, currentArtiste);
+
           queue.add(voisin);
         }
       }
@@ -189,7 +189,7 @@ public class Graph {
     throw new RuntimeException("Aucun chemin trouvé entre " + nomArtiste1 + " et " + nomArtiste2);
   }
 
-  private void afficherChemin(Map<Artiste, Artiste> predecesseur, Artiste debut, Artiste fin, int totalMentions) {
+  private void afficherChemin(Map<Artiste, Artiste> predecesseur, Artiste debut, Artiste fin, double coutTotal) {
     List<String> chemin = new ArrayList<>();
     Artiste courant = fin;
     int longueur = 0;
@@ -201,6 +201,6 @@ public class Graph {
     }
     Collections.reverse(chemin);
 
-    System.out.println("Longueur du chemin : "+longueur + " \nCoût total du chemin : " + totalMentions + " Chemin : \n" + String.join("\n", chemin));
+    System.out.println("Longueur du chemin : "+longueur + " \nCoût total du chemin : " + coutTotal + " Chemin : \n" + String.join("\n", chemin));
   }
 }
