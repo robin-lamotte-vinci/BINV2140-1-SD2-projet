@@ -4,6 +4,7 @@ public class Test {
     Graph graph = new Graph("artists.txt", "mentions.txt");
 
 
+    /*
     Artiste artiste1 = new Artiste(114,"2000 Won");
     Artiste artiste2 = new Artiste(149,"2NE1");
     Mention mention = new Mention(artiste1,artiste2,0);
@@ -24,6 +25,12 @@ public class Test {
     Artiste kendji = new Artiste(19461,"Kendji Girac");
     Artiste beatles = new Artiste(35204,"The Beatles");
 
-    graph.trouverCheminMaxMentions(beatles.getNom(),  kendji.getNom());
+
+     */
+
+    //graph.trouverCheminMaxMentionsBis( "2000 Won", "2NE1");
+
+    graph.trouverCheminMaxMentionsBis( "The Beatles", "Kendji Girac");
+    //graph.trouverCheminMaxMentionsBis("Juliette Armanet",  "The Beatles");
   }
 }
