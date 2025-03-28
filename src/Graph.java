@@ -21,6 +21,10 @@ public class Graph {
     completerMentions(pathMentionsTxt);
   }
 
+  public Map<Artiste, Set<Mention>> getMentionsSortantes() {
+    return mentionsSortantes;
+  }
+
   /**
    * Lis le fichier référencé par pathArtistesTxt et pour chaque ligne, ajoute un artiste au graph
    *
@@ -99,8 +103,11 @@ public class Graph {
    * @param mention
    */
   private void ajouterMention(Mention mention) {
-    // pareil, j'ai pas mis de gestion des exceptions
+
     Artiste artiste = mention.getArtiste1();
+
+
+
     mentionsArtiste(artiste).add(mention);
   }
 
@@ -233,41 +240,92 @@ public class Graph {
       Artiste artistePoidsMin = etiquetteMin.getKey();
       Double poidsMin = etiquetteMin.getValue();
 
-      etiquettesProvisoires.remove(artistePoidsMin);
       etiquettesDefinitives.put(artistePoidsMin, poidsMin);
       chemin.add(artistePoidsMin);
 
       if (artistePoidsMin.equals(artiste2)) {
-        //on a trouvé le chemin definitif
-        System.out.println("Longueur du chemin : " + (chemin.size()-1));
-        System.out.println("Coût total du chemin : " + poidsMin);
-        System.out.println("Chemin :");
-
-        Artiste a;
-        while( ( a = chemin.poll()) != null) {
-          System.out.println(a);
-        }
+        afficherCheminBis(chemin, poidsMin);
         return;
       }
 
-      for (Mention mention : mentionsSortantes.get(artistePoidsMin)){
-        Artiste aMentionne = mention.getArtiste2();
-
-        // si etiquettesDefinitives contient deja cet artiste, continue
-        if (etiquettesDefinitives.containsKey(aMentionne)) continue;
-
-        double nouveauPoids = poidsMin + mention.getPoids();
-
-        Double poidsActuel = etiquettesProvisoires.get(aMentionne); // null si artiste pas encore présent
-        if (poidsActuel == null ||  poidsActuel > nouveauPoids){
-          etiquettesProvisoires.put(aMentionne, nouveauPoids);
-        }
-      }
+      majEtiquettesProvisoires(etiquetteMin, etiquettesProvisoires, etiquettesDefinitives);
     }
 
-    //si on arrive ici, c'est qu'on a pas trouvé de chemin
     String message = String.format("Aucun chemin entre %s et %s", nomArtiste1, nomArtiste2);
     throw new RuntimeException( message );
 
   }
+
+  /**
+   * Met à jour les étiquettes provisoires pour les artistes mentionnés par l'artiste de l'étiquette donnée.
+   *
+   * @param etiquette l'étiquette de l'artiste actuel
+   * @param etiquettesProvisoires les étiquettes provisoires des artistes
+   * @param etiquettesDefinitives les étiquettes définitives des artistes
+   */
+  private void majEtiquettesProvisoires(Entry<Artiste, Double> etiquette, Map<Artiste, Double> etiquettesProvisoires, Map<Artiste, Double> etiquettesDefinitives) {
+
+    Artiste artisteEtiquette = etiquette.getKey();
+    Double poidsEtiquette = etiquette.getValue();
+
+    etiquettesProvisoires.remove(artisteEtiquette);
+
+    for (Mention mention : mentionsSortantes.get(artisteEtiquette)){
+      Artiste artisteMentionne = mention.getArtiste2();
+
+      // passe a la mention suivante si on a deja trouvé l'étiquette definitive de cet artiste
+      if (etiquettesDefinitives.containsKey(artisteMentionne)) continue;
+
+      double nouveauPoidsProvisoire = poidsEtiquette + mention.getPoids();
+      Double poidsProvisoire = etiquettesProvisoires.get(artisteMentionne); // null si artiste pas encore présent
+
+      if (poidsProvisoire == null || poidsProvisoire > nouveauPoidsProvisoire) {
+        etiquettesProvisoires.put(artisteMentionne, nouveauPoidsProvisoire);
+      }
+
+    }
+  }
+
+
+  private static void afficherCheminBis(Queue<Artiste> chemin, Double poids) {
+    System.out.println("Longueur du chemin : " + (chemin.size()-1));
+    System.out.println("Coût total du chemin : " + poids);
+    System.out.println("Chemin :");
+
+    Artiste artiste;
+    while( ( artiste = chemin.poll()) != null) {
+      System.out.println(artiste);
+    }
+  }
+
+  public void trouverCheminMaxMentionsTer(String nomArtiste1, String nomArtiste2){
+    Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
+    Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
+
+    //Dijkstra dijkstra = new Dijkstra(this, artiste1, artiste2);
+
+    Dijsktra4 dijkstra = new Dijsktra4(this, artiste1);
+    Map<Artiste, Double> ch = dijkstra.trouverCheminMaxMentions(artiste2);
+    System.out.println(ch.get(artiste2));
+    Deque<Artiste> chemin = dijkstra.reconstruireChemin(artiste2);
+
+    Artiste a;
+    while ((a = chemin.pollLast()) != null){
+      System.out.println(a);
+    }
+
+  }
+
+  public void trouverCheminMaxMentionsQuad(String nomArtiste1, String nomArtiste2){
+    Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
+    Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
+
+    Dijkstra dijkstra = new Dijkstra(this, artiste1, artiste2);
+
+
+
+
+  }
+
+
 }
