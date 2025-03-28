@@ -7,17 +7,15 @@ public class Graph {
     private Map<String, Artiste> correspondanceStringArtiste;
     private Map<Integer, Artiste> correspondanceIdArtiste;
     private Map<Artiste, Set<Mention>> mentionsSortantes;
-    private LinkedList<Mention>[] listeAdjacence;
+
 
     public Graph(String pathArtistesTxt, String pathMentionsTxt) {
 
         correspondanceStringArtiste = new HashMap<>();
         correspondanceIdArtiste = new HashMap<>();
         mentionsSortantes = new HashMap<>();
-        listeAdjacence = new LinkedList[35300];
-        for (int i = 0; i < listeAdjacence.length; i++) {
-            listeAdjacence[i] = new LinkedList<>();
-        }
+
+
 
 
         completerArtistes(pathArtistesTxt);
@@ -72,9 +70,7 @@ public class Graph {
 
                 Mention mention = new Mention(artiste1, artiste2, nbMentions);
 
-                for(int i=0;i<mentionStringTab.length;i++) {
-                    listeAdjacence[i%mentionStringTab.length].add(mention); // Construit la liste d'adjacence
-                }
+
                 ajouterMention(mention);
 
             }
@@ -148,30 +144,67 @@ public class Graph {
     public void trouverCheminLePlusCourt(String nomArtiste1, String nomArtiste2) {
         Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
         Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
-        int[] distances = new int[listeAdjacence.length]; // tableau pour stocker les distances de chaque chemin trouvé
-        boolean[] visited = new boolean[listeAdjacence.length]; // tableau pour connaître les sommets visités
-        PriorityQueue<Mention> pq = new PriorityQueue<>(listeAdjacence.length,Comparator.comparing(Mention::getPoids));
-        Arrays.fill(distances, Integer.MAX_VALUE); // initialise toutes les distances de chaque chemin à Integer.MAX_VALUE
-        distances[artiste1.getId()]=0; // on commence au sommet de départ (l'artiste 1)
-        while (!pq.isEmpty()) { // on boucle jusqu'assez qu'on trouve le chemin le plus court
+         // int[] distances = new int[mentionsSortantes.size()];  tableau pour stocker les distances de chaque chemin trouvé
+        Mention mention = null;
+        Artiste artisteCourant = artiste1;
+        Queue<Artiste> sommetsNonAtteints = new ArrayDeque<>();
 
-            Artiste ar = pq.poll().getArtiste2(); // on récupère l'artiste auquel il est lié
-            if (!visited[ar.getId()]) {
-                visited[ar.getId()] = true; // on suppose qu'il a été visité car on a besoin de trouver le chemin
-                for (Mention m : listeAdjacence[ar.getId()]) {
-                    Artiste voisin = m.getArtiste2();  // on récupère chaque mention de l'artiste 2 et chaque poids pour trouver un chemin
-                    Double poids = m.getPoids();
-                    if (!visited[voisin.getId()] && distances[ar.getId()] + poids.intValue() // Si on trouve un chemin plus court entre l'artiste 1
-                            < distances[voisin.getId()]) {  // et le voisin de l'artiste 2 qui revient jusqu'à l'artiste 1 on l'ajoute à la PriorityQueue
-                       distances[voisin.getId()] = distances[ar.getId()] + poids.intValue();
-                       pq.add(m);
+
+
+        Set<Artiste> sommets = new HashSet<>();
+        int longueurChemin = 1;
+        do {
+            for (Mention m : mentionsSortantes.get(artisteCourant)) {
+                if (artiste2.equals(m.getArtiste2())) {
+                    System.out.println("Longueur du chemin : " + longueurChemin);
+                    // imprimer le chemin
+                    return;
+                }
+                if (!sommets.contains(m.getArtiste2())) {
+                    sommetsNonAtteints.add(m.getArtiste2());
+                }
+
+            }
+            artisteCourant = sommetsNonAtteints.poll();
+            sommets.add(artisteCourant);
+            longueurChemin++;
+
+        } while (!sommetsNonAtteints.isEmpty());
+        System.out.println("Longueur du chemin : " + longueurChemin);
+        // aucun chemin entre ls 2
+        // Mettre une exception car si y a pas de chemin il faut le mettre
+        /*
+        for(Mention m : mentionsSortantes.get(artiste2)) {
+            sommets.add(m.getArtiste2());
+        } */
+
+        /*
+        for(Mention m : mentionsSortantes.get(artiste1)) {
+            for (Artiste a : sommets) {
+                if (m.getArtiste1().equals(artiste1) && !m.getArtiste2().equals(a)) {
+                    sommetsNonAtteints.add(a);
+                }
+            }
+        }
+        while (!mentionsSortantes.get(artiste1).contains(mention) || mention==null) {
+            Artiste ar = sommetsNonAtteints.poll();
+            for(Mention m : mentionsSortantes.get(ar)) {
+                for (Artiste a : sommets) {
+                    if (m.getArtiste1().equals(ar) && !m.getArtiste2().equals(a)) {
+                        sommetsNonAtteints.add(a);
                     }
                 }
             }
+            if(sommetsNonAtteints.isEmpty() || mention!=null) {
+                assert mention != null;
+                System.out.println("Longueur du chemin : " + mentionsSortantes.get(artiste1).size());
+            }
+
+        }
+
+         */
 
 
-
-    }
 
 
 
@@ -179,6 +212,14 @@ public class Graph {
 
 
     // TODO trouver le chemin le plus court
+        // artiste courant = sommet de depart
+        // fixer smmet depart
+        // parcourir les adjacences de ce somment
+            // pour touts les artists mentionnés
+            // si on ne l'a pas encore visité, l'joutr a la file
+            // si l'artiste == destionation => returns
+        // artiste courant == premier de la file
+        // recommence la boucle
 }
 
 public void trouverCheminMaxMentions(String nomArtiste1, String nomArtiste2) {
