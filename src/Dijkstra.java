@@ -24,15 +24,7 @@ public class Dijkstra {
 
 
     trouverCheminMaxMentions();
-
-    if (!etiquettesDefinitives.containsKey(destination)){
-      String message = String.format("Aucun chemin entre %s et %s", source.getNom(), destination.getNom());
-      throw new RuntimeException(message);
-    } else {
-      System.out.println("poids trouvé : " + etiquettesDefinitives.get(destination));
-
-      afficherCheminMaxMentions();
-    }
+    afficherCheminMaxMentions();
 
   }
 
@@ -84,6 +76,12 @@ public class Dijkstra {
       }
 
     }
+
+    if (!etiquettesDefinitives.containsKey(destination)) {
+      String message = String.format("Aucun chemin entre %s et %s", source.getNom(), destination.getNom());
+      throw new RuntimeException(message);
+    }
+
   }
 
   private void afficherCheminMaxMentions(){
@@ -94,7 +92,6 @@ public class Dijkstra {
     do {
       chemin.addLast(a);
     } while ( (a=chemins.get(a)) != null );
-    //chemin.addLast(source);
 
     // afficher le chemin
     System.out.println("Longueur du chemin : " + (chemin.size() - 1) );
