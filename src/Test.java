@@ -30,7 +30,10 @@ public class Test {
 
     //graph.trouverCheminMaxMentionsBis( "2000 Won", "2NE1");
 
-    graph.trouverCheminMaxMentionsBis( "The Beatles", "Kendji Girac");
-    //graph.trouverCheminMaxMentionsBis("Juliette Armanet",  "The Beatles");
+    graph.trouverCheminMaxMentions("The Beatles", "Kendji Girac");
+
+    //graph.trouverCheminMaxMentionsTer("Juliette Armanet",  "The Beatles");
+
+    //graph.chemin("The Beatles", "Kendji Girac");
   }
 }

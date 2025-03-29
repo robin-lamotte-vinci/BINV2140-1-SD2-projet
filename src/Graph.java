@@ -1,14 +1,16 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Graph {
 
-  private Map<String, Artiste> correspondanceStringArtiste;
-  private Map<Integer, Artiste> correspondanceIdArtiste;
-  private Map<Artiste, Set<Mention>> mentionsSortantes;
+  private final Map<String, Artiste> correspondanceStringArtiste;
+  private final Map<Integer, Artiste> correspondanceIdArtiste;
+  private final Map<Artiste, Set<Mention>> mentionsSortantes;
 
   public Graph(String pathArtistesTxt, String pathMentionsTxt) {
 
@@ -28,7 +30,7 @@ public class Graph {
   /**
    * Lis le fichier référencé par pathArtistesTxt et pour chaque ligne, ajoute un artiste au graph
    *
-   * @param pathArtistesTxt
+   * @param pathArtistesTxt path du fichier txt qui contient les artistes
    */
   private void completerArtistes(String pathArtistesTxt) {
     try (BufferedReader lecteur = new BufferedReader(new FileReader(pathArtistesTxt))) {
@@ -51,7 +53,7 @@ public class Graph {
   /**
    * Lis le fichier référencé par pathMentionsTxt et pour chaque ligne, ajoute une mention au graph
    *
-   * @param pathMentionsTxt
+   * @param pathMentionsTxt path du fichier txt qui contient les mentions
    */
   private void completerMentions(String pathMentionsTxt) {
     try (BufferedReader lecteur = new BufferedReader(new FileReader(pathMentionsTxt))) {
@@ -77,7 +79,7 @@ public class Graph {
   /**
    * Ajoute l'artiste au graph
    *
-   * @param artiste
+   * @param artiste l'artiste à ajouter
    */
   private void ajouterArtiste(Artiste artiste) {
     // faut-il checker si l'artiste est deja present ??
@@ -100,14 +102,10 @@ public class Graph {
   /**
    * Ajoute la mention au graph
    *
-   * @param mention
+   * @param mention la mention à ajouter
    */
   private void ajouterMention(Mention mention) {
-
     Artiste artiste = mention.getArtiste1();
-
-
-
     mentionsArtiste(artiste).add(mention);
   }
 
@@ -128,9 +126,8 @@ public class Graph {
    * @param artiste2
    * @return true si artiste1 contient une mention vers artiste2
    */
-  public boolean estMentionne(Artiste artiste1, Artiste artiste2) {
+  private boolean estMentionne(Artiste artiste1, Artiste artiste2) {
     // TODO rendre la methode privee;
-    // elle reste publique pour l'instant pour mes tests
     for (Mention mention : mentionsArtiste(artiste1)) {
       if (mention.getArtiste2().equals(artiste2)) {
         return true;
@@ -139,6 +136,12 @@ public class Graph {
     return false;
   }
 
+  /**
+   * Trouve et affiche le chemin le plus court entre 2 artistes
+   *
+   * @param nomArtiste1 le nom de l'artiste source
+   * @param nomArtiste2 le nom de l'artiste d destination
+   */
   public void trouverCheminLePlusCourt(String nomArtiste1, String nomArtiste2) {
     Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
     Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
@@ -146,184 +149,17 @@ public class Graph {
     // TODO trouver le chemin le plus court
   }
 
+  /**
+   * Trouve et affiche le chemin qui contient le maximum de mentions entre 2 artistes
+   *
+   * @param nomArtiste1 le nom de l'artiste source
+   * @param nomArtiste2 le nom de l'artiste d destination
+   */
   public void trouverCheminMaxMentions(String nomArtiste1, String nomArtiste2) {
     Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
     Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
 
-    // TODO trouver le chemin le plus fortement connecté
-
-    Map<Artiste, Double> coutChemin = new HashMap<>();
-    coutChemin.put(artiste1, 0.0);
-
-    //PriorityQueue<Artiste> queue = new PriorityQueue<>(Comparator.comparingInt(maxMentions::get).reversed());
-
-    PriorityQueue<Artiste> queue = new PriorityQueue<>((a1, a2) -> {
-      int compareCout = Double.compare(coutChemin.get(a2), coutChemin.get(a1));
-      if (compareCout == 0) {
-        return a1.getNom().compareTo(a2.getNom());
-      }
-      return compareCout;
-    });
-
-    Set<Artiste> dejaVisite = new HashSet<>();
-    Map<Artiste, Artiste> predecesseur = new HashMap<>();
-
-    queue.add(artiste1);
-
-    while (!queue.isEmpty()) {
-      Artiste currentArtiste = queue.poll();
-      if(!dejaVisite.add(currentArtiste)) continue;
-
-      double currentCout = coutChemin.get(currentArtiste);
-
-      if (currentArtiste.equals(artiste2)) {
-        afficherChemin(predecesseur, artiste1, artiste2, currentCout);
-        return;
-      }
-
-      for (Mention mention : mentionsArtiste(currentArtiste)) {
-        Artiste voisin = mention.getArtiste2();
-        if(dejaVisite.contains(voisin)) continue;
-
-        double newCout = currentCout + (1.0 / mention.getNbMentions());
-
-        if (!coutChemin.containsKey(voisin) || newCout > coutChemin.get(voisin)) {
-          coutChemin.put(voisin, newCout);
-          predecesseur.put(voisin, currentArtiste);
-
-          queue.add(voisin);
-        }
-      }
-    }
-    throw new RuntimeException("Aucun chemin trouvé entre " + nomArtiste1 + " et " + nomArtiste2);
-  }
-
-  private void afficherChemin(Map<Artiste, Artiste> predecesseur, Artiste debut, Artiste fin, double coutTotal) {
-    List<String> chemin = new ArrayList<>();
-    Artiste courant = fin;
-    int longueur = 0;
-
-    while (courant != null) {
-      chemin.add(courant.getNom());
-      courant = predecesseur.get(courant);
-      if (courant != null) longueur++;
-    }
-    Collections.reverse(chemin);
-
-    System.out.println("Longueur du chemin : "+longueur + " \nCoût total du chemin : " + coutTotal + " Chemin : \n" + String.join("\n", chemin));
-  }
-
-  public void trouverCheminMaxMentionsBis(String nomArtiste1, String nomArtiste2){
-    Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
-    Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
-
-    Map<Artiste, Double> etiquettesProvisoires = new HashMap<>();
-    Map<Artiste, Double> etiquettesDefinitives = new HashMap<>();
-
-    Queue<Artiste> chemin = new ArrayDeque<>();
-
-    for (Mention mention : mentionsSortantes.get(artiste1)){
-      Artiste a = mention.getArtiste2();
-      etiquettesProvisoires.put(a, mention.getPoids());
-    }
-
-    etiquettesDefinitives.put(artiste1, 0.0);
-    chemin.add(artiste1);
-
-    while (!etiquettesProvisoires.isEmpty()) {
-      Entry<Artiste, Double> etiquetteMin = etiquettesProvisoires
-          .entrySet()
-          .stream()
-          .min(Map.Entry.comparingByValue())
-          .orElseThrow(() -> new IllegalStateException("La collection ne devrait jamais être vide à ce stade"));
-
-      Artiste artistePoidsMin = etiquetteMin.getKey();
-      Double poidsMin = etiquetteMin.getValue();
-
-      etiquettesDefinitives.put(artistePoidsMin, poidsMin);
-      chemin.add(artistePoidsMin);
-
-      if (artistePoidsMin.equals(artiste2)) {
-        afficherCheminBis(chemin, poidsMin);
-        return;
-      }
-
-      majEtiquettesProvisoires(etiquetteMin, etiquettesProvisoires, etiquettesDefinitives);
-    }
-
-    String message = String.format("Aucun chemin entre %s et %s", nomArtiste1, nomArtiste2);
-    throw new RuntimeException( message );
-
-  }
-
-  /**
-   * Met à jour les étiquettes provisoires pour les artistes mentionnés par l'artiste de l'étiquette donnée.
-   *
-   * @param etiquette l'étiquette de l'artiste actuel
-   * @param etiquettesProvisoires les étiquettes provisoires des artistes
-   * @param etiquettesDefinitives les étiquettes définitives des artistes
-   */
-  private void majEtiquettesProvisoires(Entry<Artiste, Double> etiquette, Map<Artiste, Double> etiquettesProvisoires, Map<Artiste, Double> etiquettesDefinitives) {
-
-    Artiste artisteEtiquette = etiquette.getKey();
-    Double poidsEtiquette = etiquette.getValue();
-
-    etiquettesProvisoires.remove(artisteEtiquette);
-
-    for (Mention mention : mentionsSortantes.get(artisteEtiquette)){
-      Artiste artisteMentionne = mention.getArtiste2();
-
-      // passe a la mention suivante si on a deja trouvé l'étiquette definitive de cet artiste
-      if (etiquettesDefinitives.containsKey(artisteMentionne)) continue;
-
-      double nouveauPoidsProvisoire = poidsEtiquette + mention.getPoids();
-      Double poidsProvisoire = etiquettesProvisoires.get(artisteMentionne); // null si artiste pas encore présent
-
-      if (poidsProvisoire == null || poidsProvisoire > nouveauPoidsProvisoire) {
-        etiquettesProvisoires.put(artisteMentionne, nouveauPoidsProvisoire);
-      }
-
-    }
-  }
-
-
-  private static void afficherCheminBis(Queue<Artiste> chemin, Double poids) {
-    System.out.println("Longueur du chemin : " + (chemin.size()-1));
-    System.out.println("Coût total du chemin : " + poids);
-    System.out.println("Chemin :");
-
-    Artiste artiste;
-    while( ( artiste = chemin.poll()) != null) {
-      System.out.println(artiste);
-    }
-  }
-
-  public void trouverCheminMaxMentionsTer(String nomArtiste1, String nomArtiste2){
-    Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
-    Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
-
-    //Dijkstra dijkstra = new Dijkstra(this, artiste1, artiste2);
-
-    Dijsktra4 dijkstra = new Dijsktra4(this, artiste1);
-    Map<Artiste, Double> ch = dijkstra.trouverCheminMaxMentions(artiste2);
-    System.out.println(ch.get(artiste2));
-    Deque<Artiste> chemin = dijkstra.reconstruireChemin(artiste2);
-
-    Artiste a;
-    while ((a = chemin.pollLast()) != null){
-      System.out.println(a);
-    }
-
-  }
-
-  public void trouverCheminMaxMentionsQuad(String nomArtiste1, String nomArtiste2){
-    Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
-    Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
-
     Dijkstra dijkstra = new Dijkstra(this, artiste1, artiste2);
-
-
-
 
   }
 
