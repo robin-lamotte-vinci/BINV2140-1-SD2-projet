@@ -7,6 +7,9 @@ public class Graph {
     private Map<String, Artiste> correspondanceStringArtiste;
     private Map<Integer, Artiste> correspondanceIdArtiste;
     private Map<Artiste, Set<Mention>> mentionsSortantes;
+    private Map<String, List<ArtisteEtPoids>> adjList;
+    private Map<String, Integer> mentions;
+
 
 
     public Graph(String pathArtistesTxt, String pathMentionsTxt) {
@@ -14,6 +17,8 @@ public class Graph {
         correspondanceStringArtiste = new HashMap<>();
         correspondanceIdArtiste = new HashMap<>();
         mentionsSortantes = new HashMap<>();
+        mentions = new HashMap<>();
+        adjList = new HashMap<>();
 
 
 
@@ -145,9 +150,36 @@ public class Graph {
         Artiste artiste1 = correspondanceStringArtiste.get(nomArtiste1);
         Artiste artiste2 = correspondanceStringArtiste.get(nomArtiste2);
          // int[] distances = new int[mentionsSortantes.size()];  tableau pour stocker les distances de chaque chemin trouvé
-        Mention mention = null;
-        Artiste artisteCourant = artiste1;
-        Queue<Artiste> sommetsNonAtteints = new ArrayDeque<>();
+        PriorityQueue<Noeud> filePriorite = new PriorityQueue<>(Comparator.comparingInt(a -> a.cout));
+        Map<String,Integer> distances = new HashMap<>();
+        Map<String, String> precedent = new HashMap<>(); // pour stocker le chemin
+        for(String artiste : adjList.keySet()) {
+            distances.put(artiste, Integer.MAX_VALUE); // initialiser toutes les distances à l'infini
+        }
+        distances.put(artiste1.getNom(), 0);
+        filePriorite.add(new Noeud(artiste1.getNom(), 0)); // ajouter le sommet de départ à la file de priorité
+        while (!filePriorite.isEmpty()) {
+            Noeud noeudCourant = filePriorite.poll();
+            if (noeudCourant.artiste.equals(artiste2.getNom())) {
+                afficherListeArtistes(precedent, artiste2.getNom());
+                system.out.println("Coût du chemin : " + noeudCourant.cout);
+                return;
+            }
+            for (ArtisteEtPoids voisin : adjList.getOrDefault(noeudCourant.artiste, new ArrayList<>())) {
+                String voisinNom = voisin.artiste;
+                int nouveauCout = noeudCourant.cout + voisin.poids;
+                if (nouveauCout < distances.get(voisinNom)) {
+                    distances.put(voisinNom, nouveauCout);
+                    precedent.put(voisinNom, noeudCourant.artiste); // mettre à jour le chemin
+                    filePriorite.add(new Noeud(voisinNom, nouveauCout)); // ajouter le voisin à la file de priorité
+                }
+            }
+
+
+        }
+        
+        // distance de l'artiste de départ à lui-même est 0
+      /*   Queue<Artiste> sommetsNonAtteints = new ArrayDeque<>();
 
 
 
@@ -220,6 +252,35 @@ public class Graph {
             // si l'artiste == destionation => returns
         // artiste courant == premier de la file
         // recommence la boucle
+}
+private void afficherListeArtistes(Map<String, String> precedent, String fin) {
+    List<String> path = new ArrayList<>();
+    for (String at = fin; at != null; at = precedent.get(at)) {
+        path.add(at);
+    }
+    Collections.reverse(path);
+    System.out.println("Chemin :");
+    for (String artist : path) {
+        System.out.println(artist);
+    }
+}
+private static class ArtisteEtPoids {
+    String artiste;
+    int poids;
+
+    ArtisteEtPoids(String artiste, int poids) {
+        this.artiste = artiste;
+        this.poids = poids;
+    }
+}
+private static class Noeud {
+    String artiste;
+    int cout;
+
+    Noeud(String artiste, int cout) {
+        this.artiste = artiste;
+        this.cout = cout;
+    }
 }
 
 public void trouverCheminMaxMentions(String nomArtiste1, String nomArtiste2) {
