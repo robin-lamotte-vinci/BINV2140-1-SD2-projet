@@ -99,7 +99,8 @@ public class Dijkstra {
         // met a jour le poids de l'etiquette provisoire si on a trouvé un poids plus faible
         if (nouveauPoids < ancienPoids) {
           // voir methodes equals et hashCode de la classe interne Etiquette
-          // => s'il existe deja une etiquette avec cet artiste, elle sera remplacée quand on ajoutera une nouvelle etiquette avec ce meme artiste
+          // => s'il existe deja une etiquette avec cet artiste, elle sera remplacée
+          //    quand on ajoutera une nouvelle etiquette avec ce meme artiste
           Etiquette nouvelleEtiquette = new Etiquette(artisteVoisin, nouveauPoids);
           etiquettesProvisoires.add(nouvelleEtiquette);
           correspondanceArtisteEtiquette.put(artisteVoisin, nouvelleEtiquette);
@@ -138,6 +139,8 @@ public class Dijkstra {
 
   }
 
+  // Les methodes equals et hashCode de cette classe interne
+  // ne prennent en compte que l'artiste, pas le poids
   static class Etiquette {
 
     private final Artiste artiste;
