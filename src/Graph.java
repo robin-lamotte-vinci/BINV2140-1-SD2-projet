@@ -82,10 +82,6 @@ public class Graph {
    * @param artiste l'artiste à ajouter
    */
   private void ajouterArtiste(Artiste artiste) {
-    // faut-il checker si l'artiste est deja present ??
-    // il faudra peut etre l'ajouter la gestion de ce cas...
-
-    // il n'y a pas 2 fois le meme noms d'artiste, mais si c'etait le cas ca poserait probleme
     if (correspondanceStringArtiste.containsKey(artiste.getNom())) {
       System.out.println("DOUBLONS");
     }
