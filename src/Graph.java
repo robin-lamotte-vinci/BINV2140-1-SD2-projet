@@ -190,8 +190,9 @@ public class Graph {
     do {
       chemin.addLast(a);
       m = chemins.get(a);
+      a = m.getArtiste1();
       poidsChemin += (double) 1 / m.getNbMentions();
-    } while ((a = m.getArtiste1()) != artisteSource);
+    } while (a != artisteSource);
     chemin.add(artisteSource);
 
     // afficher le chemin
@@ -204,6 +205,5 @@ public class Graph {
       System.out.println(a);
     }
   }
-
 
 }
