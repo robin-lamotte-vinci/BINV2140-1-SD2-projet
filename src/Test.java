@@ -12,8 +12,8 @@ public class Test {
 
     System.out.println("--------------------------");
 
-    // graph.trouverCheminMaxMentions("Juliette Armanet", "The Beatles");
-    graph.trouverCheminLePlusCourt("Juliette Armanet", "The Beatles");
+    graph.trouverCheminMaxMentions("Juliette Armanet", "The Beatles");
+    // graph.trouverCheminLePlusCourt("Juliette Armanet", "The Beatles");
     // graph.trouverCheminMaxMentions("The Beatles", "The Beatles");
 
 
