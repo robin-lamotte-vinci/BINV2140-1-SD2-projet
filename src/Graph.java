@@ -61,8 +61,13 @@ public class Graph {
         }
       }
     }
-
+    if (!artistesVisites.contains(artisteDestination)) {
+      // exception s'il n'existe pas de chemin entre artisteSource et artisteDestination
+      String message = String.format("Aucun chemin entre %s et %s", nomArtiste1, nomArtiste2);
+      throw new RuntimeException(message);
+    }
     afficherChemin(chemins, artisteSource, artisteDestination);
+
   }
 
   /**
@@ -77,6 +82,12 @@ public class Graph {
 
     Dijkstra dijkstra = new Dijkstra(this, artiste1, artiste2);
     Map<Artiste, Mention> chemins = dijkstra.trouverCheminMaxMentions();
+
+    if (chemins==null) {
+      // exception s'il n'existe pas de chemin entre artisteSource et artisteDestination
+      String message = String.format("Aucun chemin entre %s et %s", nomArtiste1, nomArtiste2);
+      throw new RuntimeException(message);
+    }
 
     afficherChemin(chemins, artiste1, artiste2);
 
@@ -174,14 +185,6 @@ public class Graph {
    */
   private void afficherChemin(Map<Artiste, Mention> chemins, Artiste artisteSource,
       Artiste artisteDestination) {
-
-    if (chemins == null) {
-      // exception s'il n'existe pas de chemin entre artisteSource et artisteDestination
-      String message = String.format("Aucun chemin entre %s et %s", artisteSource.getNom(),
-          artisteDestination.getNom());
-      throw new RuntimeException(message);
-    }
-
     // reconstruire le chemin
     Deque<Artiste> chemin = new ArrayDeque<>();
     Artiste a = artisteDestination;
