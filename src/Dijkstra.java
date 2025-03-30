@@ -1,5 +1,3 @@
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -16,7 +14,7 @@ public class Dijkstra {
   private final Artiste artisteSource;
   private final Artiste artisteDestination;
 
-  private final Map<Artiste, Artiste> chemins;
+  private final Map<Artiste, Mention> chemins;
   private final Map<Artiste, Set<Mention>> mentionsSortantes;
   private final Map<Artiste, Etiquette> correspondanceArtisteEtiquette; // pour retrouver une etiquette provisoire facilement
 
@@ -41,8 +39,6 @@ public class Dijkstra {
       return e1.getPoids().compareTo(e2.getPoids());
     });
 
-    trouverCheminMaxMentions();
-    afficherCheminMaxMentions();
 
   }
 
@@ -56,7 +52,7 @@ public class Dijkstra {
     return (double) 1 / m.getNbMentions();
   }
 
-  private void trouverCheminMaxMentions() {
+  public Map<Artiste, Mention> trouverCheminMaxMentions() {
 
     Etiquette etiquetteSource = new Etiquette(artisteSource, 0.0);
     etiquettesProvisoires.add(etiquetteSource);
@@ -75,7 +71,7 @@ public class Dijkstra {
 
       // arreter la boucle si on a trouvé l'etiquette definitive de artisteDestination
       if (artisteDestination.equals(artisteCourant)) {
-        break;
+        return chemins;
       }
 
       for (Mention mention : mentionsSortantes.get(artisteCourant)) {
@@ -104,41 +100,45 @@ public class Dijkstra {
           Etiquette nouvelleEtiquette = new Etiquette(artisteVoisin, nouveauPoids);
           etiquettesProvisoires.add(nouvelleEtiquette);
           correspondanceArtisteEtiquette.put(artisteVoisin, nouvelleEtiquette);
-          chemins.put(artisteVoisin, artisteCourant);
+          // chemins.put(artisteVoisin, artisteCourant);
+          chemins.put(artisteVoisin, mention);
         }
       }
     }
 
-    // lance une excepetion si on a pas trouvé de chemin entre artisteSource et artisteDestination
-    if (!etiquettesDefinitives.contains(new Etiquette(artisteDestination, null))) {
-      String message = String.format("Aucun chemin entre %s et %s", artisteSource.getNom(),
-          artisteDestination.getNom());
-      throw new RuntimeException(message);
-    }
+    return null;
 
   }
 
-  private void afficherCheminMaxMentions() {
-    // reconstruire le chemin
-    Deque<Artiste> chemin = new ArrayDeque<>();
-    Artiste a = artisteDestination;
-    do {
-      chemin.addLast(a);
-    } while ((a = chemins.get(a)) != null);
+  /*
+    private void afficherCheminMaxMentions() {
+      // exception s'il n'existe pas de chemin entre artisteSource et artisteDestination
+      if (!etiquettesDefinitives.contains(new Etiquette(artisteDestination, null))) {
+        String message = String.format("Aucun chemin entre %s et %s", artisteSource.getNom(),
+            artisteDestination.getNom());
+        throw new RuntimeException(message);
+      }
 
-    // afficher le chemin
-    System.out.println("Longueur du chemin : " + (chemin.size() - 1));
-    System.out.println(
-        "Coût total du chemin : " + correspondanceArtisteEtiquette.get(artisteDestination)
-            .getPoids());
-    System.out.println("Chemin : ");
+      // reconstruire le chemin
+      Deque<Artiste> chemin = new ArrayDeque<>();
+      Artiste a = artisteDestination;
+      do {
+        chemin.addLast(a);
+      } while ((a = chemins.get(a)) != null);
 
-    while ((a = chemin.pollLast()) != null) {
-      System.out.println(a);
+      // afficher le chemin
+      System.out.println("Longueur du chemin : " + (chemin.size() - 1));
+      System.out.println(
+          "Coût total du chemin : " + correspondanceArtisteEtiquette.get(artisteDestination)
+              .getPoids());
+      System.out.println("Chemin : ");
+
+      while ((a = chemin.pollLast()) != null) {
+        System.out.println(a);
+      }
+
     }
-
-  }
-
+  */
   // Les methodes equals et hashCode de cette classe interne
   // ne prennent en compte que l'artiste, pas le poids
   static class Etiquette {
